@@ -34,7 +34,9 @@ class SelectIfcPatchInput(bpy.types.Operator):
     bl_idname = "bim.select_ifc_patch_input"
     bl_label = "Select IFC Patch Input"
     bl_options = {"REGISTER", "UNDO"}
-    filter_glob: bpy.props.StringProperty(default="*.ifc;*.ifcZIP;*.ifcXML", options={"HIDDEN"})
+    filter_glob: bpy.props.StringProperty(
+        default="*.ifc;*.ifcZIP;*.ifcXML", options={"HIDDEN"}
+    )
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
 
     def execute(self, context):
@@ -96,7 +98,9 @@ class ExecuteIfcPatch(bpy.types.Operator):
                 "file": file,
                 "recipe": props.ifc_patch_recipes,
                 "arguments": arguments,
-                "log": os.path.join(context.scene.BIMProperties.data_dir, "process.log"),
+                "log": os.path.join(
+                    context.scene.BIMProperties.data_dir, "process.log"
+                ),
             }
         )
         ifcpatch.write(output, ifc_patch_output)
@@ -115,20 +119,28 @@ class UpdateIfcPatchArguments(bpy.types.Operator):
             return {"FINISHED"}
         patch_args = context.scene.BIMPatchProperties.ifc_patch_args_attr
         patch_args.clear()
-        docs = ifcpatch.extract_docs(self.recipe, "Patcher", "__init__", ("src", "file", "logger", "args"))
+        docs = ifcpatch.extract_docs(
+            self.recipe, "Patcher", "__init__", ("src", "file", "logger", "args")
+        )
         if docs and "inputs" in docs:
             inputs = docs["inputs"]
             for arg_name in inputs:
                 arg_info = inputs[arg_name]
                 new_attr = patch_args.add()
+                data_type = arg_info.get("type", "str")
+                if isinstance(data_type, list):
+                    data_type = [dt for dt in data_type if dt != "NoneType"][0]
                 new_attr.data_type = {
+                    "Literal": "string",
                     "str": "string",
                     "float": "float",
                     "int": "integer",
                     "bool": "boolean",
-                }[arg_info.get("type", "str")]
+                }[data_type]
                 new_attr.name = arg_name
-                new_attr.set_value(arg_info.get("default", new_attr.get_value_default()))
+                new_attr.set_value(
+                    arg_info.get("default", new_attr.get_value_default())
+                )
         return {"FINISHED"}
 
 
@@ -140,7 +152,9 @@ class RunMigratePatch(bpy.types.Operator):
     schema: bpy.props.StringProperty()
 
     def execute(self, context):
-        core.run_migrate_patch(tool.Patch, infile=self.infile, outfile=self.outfile, schema=self.schema)
+        core.run_migrate_patch(
+            tool.Patch, infile=self.infile, outfile=self.outfile, schema=self.schema
+        )
         try:
             bpy.ops.file.refresh()
         except:
