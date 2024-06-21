@@ -110,14 +110,6 @@ class ExecuteIfcPatch(bpy.types.Operator):
                 ),
             }
         )
-        print(
-            f"input:{input_file}\n"
-            # f"file:{file}\n"
-            f"recipe:{props.ifc_patch_recipes}\n"
-            f"arguments:{execute_arguments}\n"
-            f"log:{os.path.join(context.scene.BIMProperties.data_dir, 'process.log')}"
-        )
-
         ifcpatch.write(output, ifc_patch_output)
         self.report({"INFO"}, f"{props.ifc_patch_recipes} patch executed successfully")
         return {"FINISHED"}
