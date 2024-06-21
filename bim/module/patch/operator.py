@@ -80,8 +80,15 @@ class ExecuteIfcPatch(bpy.types.Operator):
         if self.use_json_for_args or not props.ifc_patch_args_attr:
             arguments = json.loads(props.ifc_patch_args or "[]")
         else:
-            arguments = [arg.get_value() for arg in props.ifc_patch_args_attr]
-
+            arguments = [
+                (
+                    float(arg.get_value())
+                    if isinstance(arg.get_value(), str) and arg.get_value().isdigit()
+                    else arg.get_value()
+                )
+                for arg in props.ifc_patch_args_attr
+            ]
+            execute_arguments = [arg for arg in arguments if arg != 0]
         if props.should_load_from_memory and tool.Ifc.get():
             input_file = props.ifc_patch_input
             file = tool.Ifc.get()
@@ -97,12 +104,20 @@ class ExecuteIfcPatch(bpy.types.Operator):
                 "input": input_file,
                 "file": file,
                 "recipe": props.ifc_patch_recipes,
-                "arguments": arguments,
+                "arguments": execute_arguments,
                 "log": os.path.join(
                     context.scene.BIMProperties.data_dir, "process.log"
                 ),
             }
         )
+        print(
+            f"input:{input_file}\n"
+            # f"file:{file}\n"
+            f"recipe:{props.ifc_patch_recipes}\n"
+            f"arguments:{execute_arguments}\n"
+            f"log:{os.path.join(context.scene.BIMProperties.data_dir, 'process.log')}"
+        )
+
         ifcpatch.write(output, ifc_patch_output)
         self.report({"INFO"}, f"{props.ifc_patch_recipes} patch executed successfully")
         return {"FINISHED"}
