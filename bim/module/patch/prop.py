@@ -82,7 +82,7 @@ def update_coordinate_threshold(self, context):
     offset = props.ifc_patch_reset_absolute_coordinates_offset
     offset_threshold = props.ifc_patch_reset_absolute_coordinates_threshold
     threshold = props.ifc_patch_args_attr.get("d")
-    threshold.string_value = offset_threshold if offset != "select" else "0"
+    threshold.set_value(offset_threshold if offset != "select" else "0")
 
 
 def update_coordinate_offset(self, context):
@@ -93,9 +93,9 @@ def update_coordinate_offset(self, context):
     offset_x = props.ifc_patch_reset_absolute_coordinates_offset_x
     offset_y = props.ifc_patch_reset_absolute_coordinates_offset_y
     offset_z = props.ifc_patch_reset_absolute_coordinates_offset_z
-    x.string_value = offset_x
-    y.string_value = offset_y
-    z.string_value = offset_z
+    x.set_value(offset_x)
+    y.set_value(offset_y)
+    z.set_value(offset_z)
 
 
 class BIMPatchProperties(PropertyGroup):
